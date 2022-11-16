@@ -10,16 +10,16 @@ export const getPromotionByIdMongo = async (id: any) => {
   return promotionById
 }
 
-export const createPromotionMongo = async () => {
-  const createPromotion = await Promotions.create()
+export const createPromotionMongo = async (data: any) => {
+  const createPromotion = await Promotions.create(data)
   return createPromotion
 }
 
-export const updatePromotionMongo = async () => {
-  const promotionUpdate = await Promotions.findByIdAndUpdate()
+export const updatePromotionMongo = async (id: any, data: any) => {
+  const promotionUpdate = await Promotions.findByIdAndUpdate(id, data)
   return promotionUpdate
 }
-export const deletePromotionMongo = async () => {
-  const promotionDelete = await Promotions.findOneAndDelete()
+export const deletePromotionMongo = async (id: any) => {
+  const promotionDelete = await Promotions.findOneAndDelete(id)
   return promotionDelete
 }
