@@ -3,19 +3,14 @@ import {
   listPromotions,
   createPromotion,
   updatePromotion,
+  deletePromotion,
 } from "../../domain/business_rules/service/promotionsServices"
-import Promotions from "../models/Promotions"
 import { Request, Response } from "express"
 
-const ListPromotionsController = {
+const PromotionsController = {
   async getCollection(req: Request, res: Response) {
     try {
       const promotions = await listPromotions()
-      if (promotions.length === 0) {
-        return res.status(400).send({
-          message: "There are no registered promotions",
-        })
-      }
       return res.status(200).json(promotions)
     } catch (error) {
       return res.status(400).json({ error: error, message: "Something is wrong try again" })
@@ -25,7 +20,7 @@ const ListPromotionsController = {
   async getById(req: Request, res: Response) {
     const { id } = req.params
     try {
-      let promotions = await getPromotionById(id)
+      const promotions = await getPromotionById(id)
       return res.status(200).json(promotions)
     } catch (error) {
       return res.status(400).json({ message: "id is undefined" })
@@ -82,10 +77,6 @@ const ListPromotionsController = {
         message: "Submit all fields for registration",
       })
     }
-    const promotionExists = await Promotions.findOne({ id_region })
-    if (promotionExists) {
-      return res.status(400).json({ message: "id_region already exists" })
-    }
 
     await createPromotion(req.body).then((data: any) => {
       return res.status(200).json(data)
@@ -116,9 +107,9 @@ const ListPromotionsController = {
       ],
     } = req.body
 
-    const promotionIdExists = await await getPromotionById(id)
-    if (promotionIdExists) {
-      await updatePromotion(id, {
+    try {
+      const promotionIdExists = await await getPromotionById(id)
+      const data = await updatePromotion(promotionIdExists, {
         name,
         id_region,
         promotion_type,
@@ -140,10 +131,9 @@ const ListPromotionsController = {
         from_min,
         to_max,
         discount_price_percent,
-      }).then((data) => {
-        return res.status(200).json(data)
       })
-    } else {
+      return res.status(200).json(data)
+    } catch (error) {
       return res
         .status(400)
         .json({ message: "Send an valid id in the parameters to search for the promotion" })
@@ -151,14 +141,14 @@ const ListPromotionsController = {
   },
   async delete(req: Request, res: Response) {
     const { id } = req.params
-    const promotionIdExists = await getPromotionById(id)
-    if (promotionIdExists) {
-      await Promotions.findByIdAndDelete(id).then((data) => {
-        return res.status(200).json({ item: data, message: `${id} exluido com sucesso!` })
-      })
-    } else {
+
+    try {
+      const promotionIdExists = await getPromotionById(id)
+      const data = await deletePromotion(promotionIdExists)
+      return res.status(200).json({ item: data, message: `${id} exluido com sucesso!` })
+    } catch (error) {
       return res.status(400).json({ message: "id doesn't exist" })
     }
   },
 }
-export default ListPromotionsController
+export default PromotionsController
