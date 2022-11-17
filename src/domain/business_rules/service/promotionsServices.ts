@@ -24,21 +24,19 @@ export const createPromotion = async (data: any) => {
   if (promotionExists) {
     throw Error("There are no registered promotions")
   }
-
   return createPromotion
 }
 
 export const updatePromotion = async (id: any, data: any) => {
   const { promotionUpdate, promotionIdValidation } = await updatePromotionMongo(id, data)
-  if (!promotionIdValidation) {
-    throw Error("There are no registered promotions")
+  if (promotionIdValidation) {
+    return promotionUpdate
   }
-  return promotionUpdate
 }
 export const deletePromotion = async (id: any) => {
   const { promotionDelete } = await deletePromotionMongo(id)
-  if (!promotionDelete) {
-    throw Error("There are no registered promotions")
+  const promotionIdValid = promotionDelete?._id
+  if (promotionIdValid) {
+    return promotionDelete
   }
-  return promotionDelete
 }
